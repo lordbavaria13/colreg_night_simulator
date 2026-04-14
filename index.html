@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <title>COLREGs Night Navigation Simulator</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<div id="canvas-container"></div>
+
+<div id="main-menu" class="overlay">
+    <div class="menu-container">
+        <div class="menu-title">⚓ COLREGs Night Navigator</div>
+        <div class="menu-subtitle">Light Simulation Trainer</div>
+        <div class="scenario-grid" id="scenario-grid"></div>
+    </div>
+</div>
+
+<div id="quiz-panel" class="hidden">
+    <p id="quiz-question"></p>
+    <div class="answer-grid" id="answer-grid"></div>
+</div>
+
+<div id="result-overlay" class="overlay hidden">
+    <div id="result-panel">
+        <div class="result-icon" id="result-icon"></div>
+        <div class="result-title" id="result-title"></div>
+        <div class="result-explanation" id="result-explanation"></div>
+        <div class="result-rule" id="result-rule"></div>
+        <button class="btn-back" onclick="backToMenu()">← Back to Menu</button>
+    </div>
+</div>
+
+<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://unpkg.com/three@0.150.1/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.150.1/examples/jsm/"
+    }
+}
+</script>
+
+<script type="module" src="./js/main.js"></script>
+
+</body>
+</html>
