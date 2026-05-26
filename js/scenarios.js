@@ -52,10 +52,11 @@ export const SCENARIOS = [
         title: 'Fischereifahrzeug (Trawler)',
         cardDesc: 'Trawler beim Schleppnetzfischen',
         lights: [
-            { color: 0x00ff88, x:  0, y:  9, z:  0, sector: 'ALL_ROUND',  label: 'Grünes Rundumlicht (oben)' },
-            { color: 0xffffff, x:  0, y:  6, z:  0, sector: 'ALL_ROUND',  label: 'Weißes Rundumlicht (unten)' },
-            { color: 0xff0000, x: -3, y:  3, z:  6, sector: 'PORT',       label: 'Backbord (rot)' },
-            { color: 0x00ff00, x:  3, y:  3, z:  6, sector: 'STARBOARD',  label: 'Steuerbord (grün)' },
+            { color: 0x00ff88, x:  0, y:  20, z:  -8.8, sector: 'ALL_ROUND',  label: 'Grünes Rundumlicht (oben)' },
+            { color: 0xffffff, x:  0, y:  12, z:  -8.8, sector: 'ALL_ROUND',  label: 'Weißes Rundumlicht (unten)' },
+            { color: 0xff0000, x: -2.1, y:  5, z:  1.4, sector: 'PORT',       label: 'Backbord (rot)' },
+            { color: 0x00ff00, x:  2.1, y:  5, z:  1.4, sector: 'STARBOARD',  label: 'Steuerbord (grün)' },
+            { color: 0xffffff, x:  0, y:  1.5, z: 16, sector: 'STERN',      label: 'Hecklicht (weiß)' },
         ],
         lightDots: ['#44ffaa', '#ffffff', '#ff4444', '#44ff44'],
         question: 'Welche Art von Fahrzeug nähert sich?',
@@ -74,6 +75,7 @@ export const SCENARIOS = [
             { color: 0xff0000, x:  0, y:  7, z:  0, sector: 'ALL_ROUND',  label: '2. Rotes Rundumlicht (unten)' },
             { color: 0xff0000, x: -3, y:  3, z:  5, sector: 'PORT',       label: 'Backbord (rot)' },
             { color: 0x00ff00, x:  3, y:  3, z:  5, sector: 'STARBOARD',  label: 'Steuerbord (grün)' },
+            
         ],
         lightDots: ['#ff2222', '#ff2222', '#ff4444', '#44ff44'],
         question: 'Welche Art von Fahrzeug nähert sich?',

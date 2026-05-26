@@ -1,6 +1,7 @@
 export const state = {
     scene: null,
     camera: null,
+    cameraMode: 'firstPerson',
     renderer: null,
     controls: null,
     ambientLight: null,

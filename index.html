@@ -7,13 +7,24 @@
     <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
+<!-- LADEBILDSCHIRM -->
+<div id="loading-screen" class="overlay hidden">
+  <div class="loading-container">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Lade Szenario…</p>
+  </div>
+</div>
+
+<!-- HUD -->
+<div id="hud" class="hidden">
+  <span id="hud-scenario-name"></span>
+</div>
 
 <div id="canvas-container"></div>
 
 <div id="main-menu" class="overlay">
     <div class="menu-container">
         <div class="menu-title">⚓ COLREGs Night Navigator</div>
-        <div class="menu-subtitle">Light Simulation Trainer</div>
         <div class="scenario-grid" id="scenario-grid"></div>
     </div>
 </div>

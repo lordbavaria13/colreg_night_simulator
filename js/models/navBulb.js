@@ -50,8 +50,8 @@ export function addNavLight(
     spot.position.set(x, y, z);
     
     spot.angle = Math.min(THREE.MathUtils.degToRad(sector.halfAngle), Math.PI / 2);
-    spot.penumbra = 0.1;
-    spot.decay = 1;
+    spot.penumbra = 1.0; 
+    spot.decay = 1;;
 
     const rad = THREE.MathUtils.degToRad(sector.center);
     const target = new THREE.Object3D();
@@ -64,4 +64,8 @@ export function addNavLight(
     parentGroup.add(spot);
     parentGroup.add(target);
     spot.target = target;
+
+    const softGlow = new THREE.PointLight(colorHex, intensity * 0.2, distance * 0.3);
+    softGlow.position.set(x, y, z);
+    parentGroup.add(softGlow);
 }

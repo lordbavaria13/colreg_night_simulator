@@ -5,42 +5,39 @@ import { disableDayMode } from './lighting.js';
 import { buildQuiz } from './quiz.js';
 import { getUI } from './ui.js';
 
-export function loadScenario(scenario) {
-    const ui = getUI();
+export async function loadScenario(scenario) {
+  const ui = getUI();
+  console.log(ui);
 
-    state.currentScenario = scenario;
-    disableDayMode();
+  ui.mainMenu.classList.add('hidden');
+  ui.loadingScreen.classList.remove('hidden');
 
-    if (state.playerBoat) {
-        state.scene.remove(state.playerBoat);
-        state.playerBoat = null;
-    }
+  state.currentScenario = scenario;
+  disableDayMode();
 
-    if (state.targetShip) {
-        state.scene.remove(state.targetShip);
-        state.targetShip = null;
-    }
+  if (state.playerBoat) { state.scene.remove(state.playerBoat); state.playerBoat = null; }
+  if (state.targetShip) { state.scene.remove(state.targetShip); state.targetShip = null; }
 
-    state.playerBoat = createPlayerBoat();
-    state.scene.add(state.playerBoat);
+  state.playerBoat = createPlayerBoat();
+  state.playerBoat.position.set(0, 0, 30);
+  state.scene.add(state.playerBoat);
 
-    state.targetShip = createTargetShip(scenario);
-    state.targetShip.position.set(0, 1.5, -85);
-    state.scene.add(state.targetShip);
+  state.targetShip = await createTargetShip(scenario);
+  state.targetShip.position.set(0, 1.5, -85);
+  state.scene.add(state.targetShip);
 
-    state.camera.position.set(0, 10, 30);
-    state.controls.target.set(0, 2, 0);
-    state.controls.update();
+  state.camera.position.set(0, 10, 30);
+  state.controls.target.set(0, 2, 0);
+  state.controls.update();
 
-    ui.mainMenu.classList.add('hidden');
-    ui.resultOverlay.classList.add('hidden');
-    ui.hud.classList.remove('hidden');
-    ui.hudScenarioName.textContent = scenario.title;
+  ui.loadingScreen.classList.add('hidden');
+  ui.resultOverlay.classList.add('hidden');
+  ui.hud.classList.remove('hidden');
+  ui.hudScenarioName.textContent = scenario.title;
 
-    buildQuiz(scenario);
-    ui.quizPanel.classList.remove('hidden');
+  buildQuiz(scenario);
+  ui.quizPanel.classList.remove('hidden');
 }
-
 export function backToMenu() {
     const ui = getUI();
 

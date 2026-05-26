@@ -5,34 +5,67 @@ const _worldPos = new THREE.Vector3();
 const _camPos   = new THREE.Vector3();
 const _dirToCam = new THREE.Vector3();
 
+
 export function enableDayMode() {
     state.isDayMode = true;
-    state.waterMat.color.set(0x006994);
-    state.waterMat.specular.set(0x44aacc);
-    state.scene.fog.color.set(0x87CEEB);
+    
+    // 1. NEUER OZEAN - Farbe für den Tag anpassen
+    if (state.water && state.water.material && state.water.material.uniforms) {
+        state.water.material.uniforms['waterColor'].value.setHex(0x006994);
+        state.water.material.uniforms['sunColor'].value.setHex(0xffffff);
+    }
+    
+    state.scene.fog.color.setHex(0x87CEEB);
     state.renderer.setClearColor(0x87CEEB);
-    state.ambientLight.color.set(0xffffff);
-    state.ambientLight.intensity = 9;
+    state.ambientLight.color.setHex(0xffffff);
+    state.ambientLight.intensity = 0.6;
 
     if (!state.scene.getObjectByName('_sun')) {
-        const sun = new THREE.DirectionalLight(0xfffaee, 3);
+        const sun = new THREE.DirectionalLight(0xfffaee, 1.5);
         sun.name = '_sun';
         sun.position.set(100, 200, 100);
         state.scene.add(sun);
+        
+        // 2. Das neue Wasser an das Sonnenlicht binden (für Reflexionen)
+        if (state.water && state.water.material) {
+            state.water.material.uniforms['sunDirection'].value.copy(sun.position).normalize();
+        }
     }
 }
+    
 
 export function disableDayMode() {
     state.isDayMode = false;
-    state.waterMat.color.set(0x001a10);
-    state.waterMat.specular.set(0x113322);
-    state.scene.fog.color.set(0x020408);
+    
+    // 1. NEUER OZEAN - Farbe für die Nacht anpassen
+    if (state.water && state.water.material && state.water.material.uniforms) {
+        state.water.material.uniforms['waterColor'].value.setHex(0x001e0f);
+        state.water.material.uniforms['sunColor'].value.setHex(0x88bbff); // Mondlicht-Spiegelung
+    }
+    
+    state.scene.fog.color.setHex(0x020408);
     state.renderer.setClearColor(0x020408);
-    state.ambientLight.color.set(0x0a1020);
+    state.ambientLight.color.setHex(0x0a1020);
     state.ambientLight.intensity = 1.5;
 
     const sun = state.scene.getObjectByName('_sun');
-    if (sun) state.scene.remove(sun);
+    if (sun) {
+        state.scene.remove(sun);
+    }
+    
+    // 2. Mondlicht als DirectionalLight hinzufügen (falls noch nicht vorhanden),
+    // damit das Wasser nachts auch spiegelt!
+    if (!state.scene.getObjectByName('_moon')) {
+        const moon = new THREE.DirectionalLight(0x88bbff, 0.5);
+        moon.name = '_moon';
+        moon.position.set(-100, 200, -100);
+        state.scene.add(moon);
+        
+        // Wasser an das Mondlicht binden
+        if (state.water && state.water.material) {
+            state.water.material.uniforms['sunDirection'].value.copy(moon.position).normalize();
+        }
+    }
 }
 
 export function updateLightVisibility(shipGroup, camera) {

@@ -1,0 +1,44 @@
+- die lichterführung war sehr kompliziert / licht nur anzeigen lassen, wenn man im richtigen winkel dazu steht (sektoren)
+- segelboot mit fortgeschrittenen techniken (vorlesung 7) erstellt
+- blender model hinzufügen
+- lichter an blender models anfügen
+- three js waser addon hinzugefügt
+- waternormals texture von github: https://github.com/mrdoob/three.js/blob/6774f1e4aa52d10e0e14b017427bcf7e558b8d81/examples/textures/waternormals.jpg
+- eine kleine ebene darunter gelegt um die navbulbs reflektieren zu lassen
+
+wellen und bootposition:
+- um wellen zu haben wurde die funktion ocean/getWaveInfo() hinzugefügt. Diese Funktion gibt die höhen und neigungvektoren
+ von booten an bestimmten Orten abhängig der wellen wieder
+ - boot müssen dann auch transformierd werden, damit sich sich zu den wellen bewegen (die höhe wird berechnet)
+
+
+
+
+ ###############
+ - ladebildschirm (vor allem bei neuer scene laden)
+ - fahrphysik bei playerboot
+ - mehrere models einfügen und die lichter dazu anpassen
+ - für jedes scenario targetship eine spezifischen tiefgang angeben (ansonsten sind boote in der luft und im wasser durch wellen)
+ - evtl targetships fahren lassen
+ - evtl die kardinaltonnen mit einbauen
+ - evtl mond
+ - evtl regen
+ - evtl stärkerer nebel
+ - das quiz muss wieder rein 
+ - die tafeln im hauptmenü sollen gemischt werden und erst die lösung anzeigen, wenn richtig beantwortet
+ - daymodus raus
+ - für touch optimieren
+ - tastenaktionen anzeigen
+ - evtl auch polizeiboot scenario
+ - orbit controll nicht unter wasser schauen lassen
+ - grenzen machen, damit man nicht zu weit vom target wegfahren kann 
+
+ - über das spiel - button einbauen für credits
+ 
+ !!! in credits in model authoren anzeigen:
+beispiel:
+<div id="credits" style="font-size: 12px; color: #666; margin-top: 20px; text-align: center;">
+  <strong>3D Models & Assets:</strong><br>
+  "Fishing boat 01" by <a href="https://sketchfab.com/3d-models/fishing-boat-01-568c7b0d20854bab9b5f3abde971db8e" target="_blank">AuthorName</a> 
+  is licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.
+</div>

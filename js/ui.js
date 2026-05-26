@@ -1,6 +1,7 @@
 export function getUI() {
     return {
         mainMenu: document.getElementById('main-menu'),
+        loadingScreen: document.getElementById('loading-screen'),
         hud: document.getElementById('hud'),
         hudScenarioName: document.getElementById('hud-scenario-name'),
         quizPanel: document.getElementById('quiz-panel'),
