@@ -9,25 +9,25 @@ const plasticWhiteTexture = textureLoader.load('./assets/textures/plastered_wall
 
 const matWood = new THREE.MeshStandardMaterial({ 
     map: woodTexture,
-    roughness: 0.8 // Holz glänzt nicht stark
-});
-
-const matMetal = new THREE.MeshStandardMaterial({ 
-    map: metalTexture,
-    roughness: 0.6,
-    metalness: 0.8
+    roughness: 0.8
 });
 
 const matPlasticBlue = new THREE.MeshStandardMaterial({ 
     map: plasticBlueTexture,
-    roughness: 0.7,
-    metalness: 0.2
+    roughness: 0.95,
+    metalness: 0.0, 
 });
 
 const matPlasticWhite = new THREE.MeshStandardMaterial({ 
     map: plasticWhiteTexture,
-    roughness: 0.7,
-    metalness: 0.1
+    roughness: 0.95,
+    metalness: 0.0,
+});
+
+const matMetal = new THREE.MeshStandardMaterial({ 
+    map: metalTexture,
+    roughness: 0.75,
+    metalness: 0.5, 
 });
 
 export let steeringWheel = null;
@@ -36,13 +36,13 @@ export let cameraAnchor = null;
 export function createPlayerBoat() {
     const g = new THREE.Group();
 
-    const mat = (c, opts = {}) => new THREE.MeshPhongMaterial({ 
-        color: c,
-        emissive: c,
-        emissiveIntensity: 0.1,
-        side: THREE.DoubleSide, 
-        ...opts
-    });
+const mat = (c, opts = {}) => new THREE.MeshStandardMaterial({ 
+    color: c,
+    roughness: 0.92,
+    metalness: 0.0,
+    side: THREE.DoubleSide, 
+    ...opts
+});
 
     
     // Rumpf
@@ -53,11 +53,11 @@ export function createPlayerBoat() {
     hullShape.quadraticCurveTo(-1.5, 2.0, 0, 4.5);
 
     const extrudeSettings = {
-        depth: 1.6,          // Höhe des Rumpfes
+        depth: 1.6,
         bevelEnabled: true,
         bevelSegments: 4,
         steps: 2,
-        bevelSize: 0.2,      // Abrundung oben/unten
+        bevelSize: 0.2,
         bevelThickness: 0.3
     };
 
@@ -102,7 +102,7 @@ export function createPlayerBoat() {
     const boomGeo = new THREE.CylinderGeometry(0.05, 0.05, 4.5, 12);
     boomGeo.rotateX(Math.PI / 2);
     const boom = new THREE.Mesh(boomGeo, matMetal);
-    boom.position.set(0, 4.0, -1.7); // Ragt nach hinten
+    boom.position.set(0, 4.0, -1.7);
     g.add(boom);
 
     // Steuerrad
@@ -116,7 +116,7 @@ export function createPlayerBoat() {
     }
     const rimGeo = new THREE.LatheGeometry(points, 32);
     rimGeo.rotateX(Math.PI / 2);
-    const rim = new THREE.Mesh(rimGeo, matWood); // Holzfarbe
+    const rim = new THREE.Mesh(rimGeo, matWood);
     wheelGroup.add(rim);
 
     // Nabe
@@ -135,48 +135,41 @@ export function createPlayerBoat() {
     const columnGeo = new THREE.CylinderGeometry(0.15, 0.2, 1.0, 16);
     const column = new THREE.Mesh(columnGeo, matMetal);
     column.position.set(0, 1.8, -2.9);
-    // Säule leicht nach hinten geneigt
     column.rotation.x = 0.2; 
     g.add(column);
 
     g.add(wheelGroup);
-    steeringWheel = wheelGroup; // Exportiert für die Animation
+    steeringWheel = wheelGroup;
 
     // Segel
             const sailShape = new THREE.Shape();
-            sailShape.moveTo(0, 0);       // Mast unten
-            sailShape.lineTo(0, 8);       // Mast oben
-            sailShape.quadraticCurveTo(2, 4, 4.8, 0); // Geschwungene Achterliek (Außenkante)
+            sailShape.moveTo(0, 0);       
+            sailShape.lineTo(0, 8);       
+            sailShape.quadraticCurveTo(2, 4, 4.8, 0); 
             sailShape.lineTo(0, 0);
             
             const sailGeo = new THREE.ShapeGeometry(sailShape);
             const sail = new THREE.Mesh(sailGeo, mat(0xf9f9f9));
-            sail.position.set(0, 4.1, 0.4); // Leicht hinter dem Mast
-            sail.rotation.y = Math.PI/2; // Segel leicht vom Wind zur Seite geblasen
+            sail.position.set(0, 4.1, 0.4);
+            sail.rotation.y = Math.PI/2;
             g.add(sail);
 
-    // ==========================================
-    // 5. KAMERA-ANKER (First-Person)
-    // ==========================================
-    
     cameraAnchor = new THREE.Object3D();
     cameraAnchor.position.set(0, 2.7, -4.2); 
     g.add(cameraAnchor);
 
-    // ==========================================
-    // 6. BELEUCHTUNG & NAVIGATION
-    // ==========================================
-    
-    const deckLight = new THREE.PointLight(0xffffee, 1.0, 15);
+    const deckLight = new THREE.PointLight(0xffffee, 0.3, 8);
     deckLight.position.set(0, 4, -1);
     g.add(deckLight);
 
-    // Positionen angepasst an den neuen Rumpf
-    addNavLight(g, 0xff0000, -1.3, 1.4, 1.5, 'PORT', 0.5, 10, 0.2);
-    addNavLight(g, 0x00ff00, 1.3, 1.4, 1.5, 'STARBOARD', 0.5, 10, 0.2);
-    addNavLight(g, 0xffffff, 0, 14, 0.5, 'MASTHEAD', 0.6, 15, 0.2);
-    addNavLight(g, 0xffffff, 0, 1.3, -4.5, 'STERN', 0.5, 10, 0.2);
+    addNavLight(g, 0xff0000, -1.3, 1.4, 1.5, 'PORT',     0.4, 12, 0.2);
+addNavLight(g, 0x00ff00,  1.3, 1.4, 1.5, 'STARBOARD', 0.4, 0, 0.2);
+addNavLight(g, 0xffffff,  0,  14,   0.5, 'MASTHEAD',  0.5, 0, 0.2);
+addNavLight(g, 0xffffff,  0,   1.3, -4.5,'STERN',     0.4, 0, 0.2);
 
     g.rotateY(Math.PI);
+    
     return g;
+
+    
 }

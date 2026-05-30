@@ -16,4 +16,7 @@ export const state = {
 
     isDayMode: false,
     keys: {},
+
+    currentRoute: null,
+    routeT: 0,
 };

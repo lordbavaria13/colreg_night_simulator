@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { Water } from 'three/addons/objects/Water.js';
 
-// Wellen-Parameter für große, langsame Dünung (Schwell)
+// Wave parameters for large, slow swell
 const waveA = { speed: 1.0, scale: 1.2, dirX: 1.0, dirZ: 0.5 };
 const waveB = { speed: 0.6, scale: 0.8, dirX: -0.5, dirZ: 1.0 };
 const waveC = { speed: 1.5, scale: 0.5, dirX: 0.2, dirZ: 0.8 };
@@ -10,7 +10,6 @@ const waveC = { speed: 1.5, scale: 0.5, dirX: 0.2, dirZ: 0.8 };
 export function createOcean(scene) {
     const oceanGroup = new THREE.Group();
     
-    // WICHTIG: Segmente (z.B. 256x256 statt 1x1), für gebogenes Wasser!
     const waterGeometry = new THREE.PlaneGeometry(2000, 2000, 256, 256);
 
     const textureLoader = new THREE.TextureLoader();
@@ -18,33 +17,33 @@ export function createOcean(scene) {
         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
     });
 
-    const water = new Water(
-        waterGeometry,
-        {
-            textureWidth: 512,
-            textureHeight: 512,
-            waterNormals: waterNormals,
-            sunDirection: new THREE.Vector3(-100, 200, -100).normalize(),
-            sunColor: 0x88bbff,
-            waterColor: 0x001e0f,
-            distortionScale: 3.7,
-            fog: scene !== undefined && scene.fog !== undefined,
-            alpha: 0.9 
-        }
-    );
+const water = new Water(
+    waterGeometry,
+    {
+        textureWidth: 512,
+        textureHeight: 512,
+        waterNormals: waterNormals,
+        sunDirection: new THREE.Vector3(-100, 200, -100).normalize(),
+        sunColor: 0x112233,   
+        waterColor: 0x001208,  
+        distortionScale: 3.7,
+        fog: scene !== undefined && scene.fog !== undefined,
+        alpha: 0.92
+    }
+);
     water.rotation.x = -Math.PI / 2;
     
-    const mirrorMat = new THREE.MeshStandardMaterial({
-        color: 0x000510,
-        roughness: 0.6,
-        metalness: 0.3,
-        normalMap: waterNormals,
-        normalScale: new THREE.Vector2(0.1, 0.1) 
-    });
+const mirrorMat = new THREE.MeshStandardMaterial({
+    color: 0x000510,
+    roughness: 0.92,
+    metalness: 0.05,
+    normalMap: waterNormals,
+    normalScale: new THREE.Vector2(0.05, 0.05)
+});
 
     const mirrorPlane = new THREE.Mesh(waterGeometry, mirrorMat);
     mirrorPlane.rotation.x = -Math.PI / 2;
-    mirrorPlane.position.y = -0.5; // Verhindert Z-Fighting
+    mirrorPlane.position.y = -0.5;
 
     oceanGroup.add(mirrorPlane);
     oceanGroup.add(water);
@@ -52,7 +51,6 @@ export function createOcean(scene) {
     oceanGroup.userData.water = water;
     oceanGroup.userData.mirrorMat = mirrorMat;
 
-    // speichern der originalen Vertices, damit jeder Frame der Wellen neu berechnet werden kann
     const posAttribute = waterGeometry.attributes.position;
     oceanGroup.userData.origZ = new Float32Array(posAttribute.count);
     for (let i = 0; i < posAttribute.count; i++) {
@@ -71,7 +69,6 @@ export function updateOcean(oceanGroup, time) {
     const posAttr = oceanGroup.userData.posAttribute;
     const origZ = oceanGroup.userData.origZ;
 
-    // 1. Textur-Animation (Kleine Kräuselwellen)
     if (water && water.material && water.material.uniforms['time']) {
         water.material.uniforms['time'].value += 1.0 / 60.0;
     }
@@ -80,23 +77,17 @@ export function updateOcean(oceanGroup, time) {
         mirrorMat.normalMap.offset.y += 0.0001;
     }
 
-    // 2. GEOMETRIE-ANIMATION (Echte, große Dünungswellen)
     if (posAttr && origZ) {
         for (let i = 0; i < posAttr.count; i++) {
-            // Plane ist um X rotiert, daher ist X und Y in der Plane eigentlich X und Z in der Welt
             const vx = posAttr.getX(i);
             const vy = posAttr.getY(i); 
             
-            // Hole die Wellenhöhe für diesen Punkt
             const wave = getWaveInfo(vx, -vy, time); 
             
-            // Setze die Z-Achse der Plane (was durch die Rotation zur Y-Höhe in der Welt wird)
             posAttr.setZ(i, origZ[i] + wave.height);
         }
-        // WICHTIG: Three.js updaten
         posAttr.needsUpdate = true;
         
-        // Optional für perfekte Beleuchtung: Normalen neu berechnen
         oceanGroup.children[0].geometry.computeVertexNormals(); 
     }
 }
@@ -125,7 +116,7 @@ export function getWaveInfo(x, z, time) {
     dx += Math.cos(phaseC) * waveC.scale * 0.3 * waveC.dirX;
     dz += Math.cos(phaseC) * waveC.scale * 0.3 * waveC.dirZ;
 
-    // Normalenvektor der Welle berechnen (zeigt senkrecht aus der Welle heraus)
+    // Normalenvektor der Welle berechnen
     const normal = new THREE.Vector3(-dx, 1, -dz).normalize();
 
     return { height: y, normal: normal };

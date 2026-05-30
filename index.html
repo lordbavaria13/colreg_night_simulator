@@ -3,44 +3,137 @@
 <head>
     <title>COLREGs Night Navigation Simulator</title>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-<!-- LADEBILDSCHIRM -->
+
+<!-- Touch Controls -->
+<div id="touch-controls">
+    <div id="touch-steer">
+        <button id="btn-left"  aria-label="Left">◀</button>
+        <button id="btn-right" aria-label="Right">▶</button>
+    </div>
+    <button id="btn-throttle" aria-label="Throttle">▲</button>
+</div>
+
+<!-- Loading screen -->
 <div id="loading-screen" class="overlay hidden">
   <div class="loading-container">
     <div class="loading-spinner"></div>
-    <p class="loading-text">Lade Szenario…</p>
+    <p class="loading-text">Loading scenario…</p>
   </div>
 </div>
 
 <!-- HUD -->
 <div id="hud" class="hidden">
   <span id="hud-scenario-name"></span>
+  <button id="btn-back-hud" onclick="backToMenu()" title="Back to menu">✕</button>
 </div>
 
 <div id="canvas-container"></div>
 
+<!-- Main menu -->
 <div id="main-menu" class="overlay">
     <div class="menu-container">
+
+        
+        <div id="menu-topbar">
+            <button class="topbar-btn" id="btn-credits" title="Credits">ℹ️</button>
+            <div id="lang-switcher">
+                <button id="lang-de" class="lang-btn lang-active" title="Deutsch">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 5 3" width="28" height="17">
+                        <rect width="5" height="1" y="0" fill="#000"/>
+                        <rect width="5" height="1" y="1" fill="#DD0000"/>
+                        <rect width="5" height="1" y="2" fill="#FFCE00"/>
+                    </svg>
+                    <span>DE</span>
+                </button>
+                <button id="lang-en" class="lang-btn" title="English">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30" width="28" height="17">
+                        <rect width="60" height="30" fill="#012169"/>
+                        <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/>
+                        <path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="4"/>
+                        <path d="M30,0 V30 M0,15 H60" stroke="#fff" stroke-width="10"/>
+                        <path d="M30,0 V30 M0,15 H60" stroke="#C8102E" stroke-width="6"/>
+                    </svg>
+                    <span>EN</span>
+                </button>
+            </div>
+            <button class="topbar-btn" id="btn-shortcuts" title="Tastenkürzel">⌨️</button>
+        </div>
+
         <div class="menu-title">⚓ COLREGs Night Navigator</div>
+        <div class="menu-subtitle" id="menu-subtitle">Identify navigation lights — COLREG</div>
+
+        <!-- Progress -->
+        <div id="progress-bar-wrap">
+            <div id="progress-bar-fill"></div>
+        </div>
+        <div id="progress-label"></div>
+
         <div class="scenario-grid" id="scenario-grid"></div>
+
+        <button id="btn-reset-progress" onclick="resetProgress()">↺ <span data-i18n="resetProgress">Reset progress</span></button>
     </div>
 </div>
 
+<!-- Quiz panel -->
 <div id="quiz-panel" class="hidden">
-    <p id="quiz-question"></p>
-    <div class="answer-grid" id="answer-grid"></div>
+    <button id="quiz-toggle" title="Toggle quiz">▼</button>
+    <div id="quiz-body">
+        <p id="quiz-question"></p>
+        <div class="answer-grid" id="answer-grid"></div>
+    </div>
 </div>
 
+<!-- Result overlay -->
 <div id="result-overlay" class="overlay hidden">
     <div id="result-panel">
         <div class="result-icon" id="result-icon"></div>
         <div class="result-title" id="result-title"></div>
         <div class="result-explanation" id="result-explanation"></div>
         <div class="result-rule" id="result-rule"></div>
-        <button class="btn-back" onclick="backToMenu()">← Back to Menu</button>
+        <button class="btn-back" id="btn-result-back">← <span data-i18n="backToMenu">Back to menu</span></button>
+    </div>
+</div>
+
+<!-- CREDITS MODAL -->
+<div id="credits-modal" class="modal-backdrop hidden">
+    <div class="modal-box">
+        <button class="modal-close" id="btn-credits-close">✕</button>
+        <h2>⚓ COLREGs Night Navigator</h2>
+        <p class="credits-about" id="credits-about-text"></p>
+        <hr class="credits-divider">
+        <p class="credits-section-title" id="credits-by-label"></p>
+        <p>Alexander Harant</p>
+        <hr class="credits-divider">
+        <p class="credits-section-title" id="credits-assets-label"></p>
+        <p style="font-size:0.82em; color:#aaa; line-height:1.7;">
+            <span id="credits-asset-text"></span>
+            <a href="https://sketchfab.com/3d-models/fishing-boat-01-568c7b0d20854bab9b5f3abde971db8e" target="_blank">gogiart</a>
+            — <span id="credits-license-label"></span>:
+            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>
+        </p>
+        <hr class="credits-divider">
+        <p class="credits-section-title" id="credits-basis-label"></p>
+        <p style="font-size:0.82em; color:#aaa;" id="credits-basis-text"></p>
+    </div>
+</div>
+
+<!-- SHORTCUTS MODAL -->
+<div id="shortcuts-modal" class="modal-backdrop hidden">
+    <div class="modal-box">
+        <button class="modal-close" id="btn-shortcuts-close">✕</button>
+        <h2 id="shortcuts-title"></h2>
+        <table class="shortcuts-table">
+            <tr><td><kbd>1</kbd>–<kbd>4</kbd></td><td id="sc-answer"></td></tr>
+            <tr><td><kbd>Esc</kbd></td><td id="sc-back"></td></tr>
+            <tr><td><kbd>Q</kbd></td><td id="sc-quiz"></td></tr>
+            <tr><td><kbd>C</kbd></td><td id="sc-camera"></td></tr>
+            <tr><td><kbd>Mouse</kbd></td><td id="sc-mouse"></td></tr>
+            <tr><td><kbd>Touch</kbd></td><td id="sc-touch"></td></tr>
+        </table>
     </div>
 </div>
 
@@ -53,7 +146,6 @@
     }
 }
 </script>
-
 <script type="module" src="./js/main.js"></script>
 
 </body>

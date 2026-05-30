@@ -1,13 +1,15 @@
 import { enableDayMode } from './lighting.js';
 import { getUI } from './ui.js';
+import { tScenario, getLang } from './i18n.js';   // ← NEU
 
 export function buildQuiz(scenario) {
     const ui = getUI();
 
-    ui.quizQuestion.textContent = scenario.question;
+    ui.quizQuestion.textContent = tScenario(scenario, 'question');
     ui.answerGrid.innerHTML = '';
 
-    scenario.answers.forEach((text, i) => {
+    const answers = tScenario(scenario, 'answers');
+    answers.forEach((text, i) => {
         const btn = document.createElement('button');
         btn.className = 'answer-btn';
         btn.textContent = text;
@@ -20,7 +22,7 @@ export function handleAnswer(chosen, scenario) {
     document.querySelectorAll('.answer-btn').forEach((btn, i) => {
         btn.disabled = true;
         if (i === scenario.correctIndex) btn.classList.add('correct');
-        else if (i === chosen) btn.classList.add('wrong');
+        else if (i === chosen)           btn.classList.add('wrong');
     });
 
     setTimeout(() => {
@@ -32,11 +34,20 @@ export function handleAnswer(chosen, scenario) {
 function showResult(isCorrect, scenario) {
     const ui = getUI();
 
+    if (isCorrect) {
+        if (window.markSolved) window.markSolved(scenario.id);
+        if (window.renderMenu) window.renderMenu();
+    }
+
     ui.quizPanel.classList.add('hidden');
     ui.resultOverlay.classList.remove('hidden');
-    ui.resultIcon.textContent = isCorrect ? '✅' : '❌';
-    ui.resultTitle.textContent = isCorrect ? 'Richtig!' : 'Leider falsch.';
-    ui.resultTitle.className = 'result-title ' + (isCorrect ? 'correct' : 'wrong');
-    ui.resultExplanation.textContent = scenario.explanation;
-    ui.resultRule.textContent = scenario.rule;
+    ui.resultIcon.textContent  = isCorrect ? '✅' : '❌';
+
+    ui.resultTitle.textContent = isCorrect
+        ? tScenario(scenario, 'resultCorrect') ?? 'Richtig!'
+        : tScenario(scenario, 'resultWrong')   ?? 'Leider falsch.';
+    ui.resultTitle.className   = 'result-title ' + (isCorrect ? 'correct' : 'wrong');
+
+    ui.resultExplanation.textContent = tScenario(scenario, 'explanation');
+    ui.resultRule.textContent        = tScenario(scenario, 'rule');
 }
