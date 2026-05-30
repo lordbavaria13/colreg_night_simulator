@@ -14,6 +14,8 @@ import { MAX_DIST, FOG_START,
          NAV_INTENSITY_NEAR, NAV_INTENSITY_FAR,
          NAV_SIZE_NEAR, NAV_SIZE_FAR } from './config.js';
 
+const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+if (isMobile) document.body.classList.add('touch-device');
 
 state.scene = new THREE.Scene();
 state.scene.fog = new THREE.FogExp2(0x020408, 0.001);
@@ -275,7 +277,6 @@ function renderMenu() {
     set('credits-basis-label',  'creditsBasis');
     set('credits-basis-text',   'creditsBasisText');
 
-    // Shortcuts übersetzen
     set('shortcuts-title', 'shortcutsTitle');
     set('sc-answer',       'shortcutAnswer');
     set('sc-back',         'shortcutBack');

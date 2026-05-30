@@ -432,6 +432,9 @@ kbd {
     pointer-events: none;
     z-index: 50;
 }
+body.sim-active.touch-device #touch-controls {
+    display: flex !important;
+}
 
 @media (hover: none) and (pointer: coarse) {
     body.sim-active #touch-controls { display: flex !important; }
