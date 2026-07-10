@@ -22,3 +22,13 @@ Format für einen neuen Eintrag (neueste Einträge immer oben anfügen, nicht un
 ```
 
 Committe und pushe den Session-Log-Eintrag zusammen mit den restlichen Änderungen der Session, wenn Alex das möchte.
+
+## Kontext-Speicher: Obsidian Vault
+
+Alex' Obsidian-Vault (github.com/lordbavaria13/obsidian-vault, privates Repo) ist sein Zweites Gehirn und der zentrale Kontext-Speicher für alles Sailbyte-Bezogene. Wenn du in diesem Repo arbeitest und übergeordneten Kontext brauchst, zum Beispiel Alex' Hintergrund, Zielgruppe, Angebot, Schreibstil und Tonalität, oder das große Ziel und die geplanten Features dieses Projekts, hol dir die relevanten Infos von dort statt zu raten:
+
+- `00 Kontext/Über mich.md`, `ICP.md`, `Angebot.md`, `Schreibstil.md`, `Branding.md` – persönliches Profil, Zielgruppe, Angebot, Schreibstil, Branding
+- `02 Projekte/COLREG Night Simulator.md` – die zu diesem Repo gehörende Projekt-Notiz mit Ziel, Features und technischer Umsetzung
+- `03 Bereiche/Persönlichkeitsentwicklung/Ideenjournal.md` – lose Ideen, die eventuell relevant für dieses Projekt sein könnten
+
+Falls das Vault-Repo lokal noch nicht verfügbar ist, klone es read-only mit `git clone https://github.com/lordbavaria13/obsidian-vault`, um die Dateien zu lesen. Nimm dort keine Änderungen vor, außer Alex bittet dich explizit die Projekt-Doku dort zu aktualisieren.
