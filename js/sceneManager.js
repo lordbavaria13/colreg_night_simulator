@@ -51,6 +51,18 @@ export async function loadScenario(scenario) {
 
 export function backToMenu() {
     loadGeneration++;
+
+    if (state.deepLinked) {
+        // Per Deep-Link aus einer Quizfrage gestartet: zurück in die App
+        // statt ins volle Szenario-Menü zu wechseln.
+        if (window.ColregBridge?.postMessage) {
+            window.ColregBridge.postMessage(JSON.stringify({ type: 'close' }));
+            return;
+        }
+        // Kein Bridge vorhanden (z.B. Aufruf direkt im Browser) -> Fallback aufs Menü
+        state.deepLinked = false;
+    }
+
     const ui = getUI();
 
     if (state.playerBoat) {

@@ -334,7 +334,10 @@ window.ColregSimulator = {
 
         if (payload.scenarioId) {
             const selected = SCENARIOS.find(s => s.id === payload.scenarioId);
-            if (selected) loadScenario(selected);
+            if (selected) {
+                state.deepLinked = true;
+                loadScenario(selected);
+            }
         }
     },
 };

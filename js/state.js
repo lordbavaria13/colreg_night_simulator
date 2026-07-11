@@ -19,4 +19,8 @@ export const state = {
 
     currentRoute: null,
     routeT: 0,
+
+    // true wenn die Seite per App-Bridge direkt mit einer scenarioId
+    // gestartet wurde (Deep-Link aus einer Quizfrage heraus)
+    deepLinked: false,
 };
