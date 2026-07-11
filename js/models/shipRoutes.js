@@ -81,3 +81,39 @@ export function getRandomRoute() {
         dir:    1,
     };
 }
+
+const FIXED_PRESETS = {
+    stationary: { x: 0, z: -85, heading: 0 },
+    head_on: { x: 0, z: -85, heading: 0 },
+    port_side: { x: 0, z: -85, heading: -Math.PI / 2 },
+    starboard_side: { x: 0, z: -85, heading: Math.PI / 2 },
+    approaching_from_stern: { x: 0, z: 95, heading: Math.PI },
+};
+
+export function getScenarioRoute(preset) {
+    if (preset === 'gyring_head_on' || preset === 'gyring_stern') {
+        const stern = preset === 'gyring_stern';
+        return {
+            type: 'loop',
+            speed: 0.025,
+            startT: 0,
+            dir: 1,
+            fn: (t) => ({
+                x: 0,
+                z: -85,
+                heading: (stern ? Math.PI : 0) + Math.sin(t * Math.PI * 2) * 0.38,
+            }),
+        };
+    }
+
+    const fixed = FIXED_PRESETS[preset];
+    if (!fixed) return getRandomRoute();
+
+    return {
+        type: 'fixed',
+        speed: 0,
+        startT: 0,
+        dir: 1,
+        fn: () => fixed,
+    };
+}

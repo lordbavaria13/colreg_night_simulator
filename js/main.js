@@ -198,34 +198,65 @@ canvasContainer.addEventListener('touchmove', (e) => {
 renderMenu();
 window.backToMenu = backToMenu;
 
-function getSolvedSet() {
+const PROGRESS_KEY = 'colregs_progress_v2';
+let appProgress = null;
+
+function getProgress() {
     try {
-        const raw = sessionStorage.getItem('colregs_solved');
-        return raw ? new Set(JSON.parse(raw)) : new Set();
-    } catch { return new Set(); }
+        if (appProgress) return appProgress;
+        const raw = localStorage.getItem(PROGRESS_KEY);
+        return raw ? JSON.parse(raw) : {};
+    } catch { return {}; }
 }
 
-function markSolved(scenarioId) {
-    const solved = getSolvedSet();
-    solved.add(scenarioId);
-    try { sessionStorage.setItem('colregs_solved', JSON.stringify([...solved])); } catch {}
+function saveProgress(progress) {
+    if (appProgress) {
+        appProgress = progress;
+        return;
+    }
+    try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress)); } catch {}
+}
+
+function recordScenarioAnswer(scenarioId, isCorrect) {
+    const progress = getProgress();
+    const current = progress[scenarioId] ?? { correct: 0, wrong: 0, lastCorrect: false };
+    progress[scenarioId] = {
+        correct: current.correct + (isCorrect ? 1 : 0),
+        wrong: current.wrong + (isCorrect ? 0 : 1),
+        lastCorrect: isCorrect,
+    };
+    saveProgress(progress);
+
+    if (window.ColregBridge?.postMessage) {
+        window.ColregBridge.postMessage(JSON.stringify({
+            type: 'answer',
+            scenarioId,
+            correct: isCorrect,
+        }));
+    }
 }
 
 window.resetProgress = function() {
-    try { sessionStorage.removeItem('colregs_solved'); } catch {}
+    appProgress = appProgress ? {} : null;
+    try { localStorage.removeItem(PROGRESS_KEY); } catch {}
+    if (window.ColregBridge?.postMessage) {
+        window.ColregBridge.postMessage(JSON.stringify({ type: 'reset' }));
+    }
     renderMenu();
 };
 
 function updateProgressUI() {
     const ui = getUI();
-    const solved = getSolvedSet();
+    const progress = getProgress();
     const total  = SCENARIOS.length;
-    const done   = [...solved].filter(id => SCENARIOS.find(s => s.id === id)).length;
+    const knownIds = new Set(SCENARIOS.map(s => s.id));
+    const done = Object.entries(progress).filter(([id, value]) => knownIds.has(id) && value.correct > 0).length;
+    const wrong = Object.entries(progress).filter(([id, value]) => knownIds.has(id) && value.wrong > 0 && value.correct === 0).length;
     const pct    = total > 0 ? (done / total) * 100 : 0;
 
     if (ui.progressBarFill) ui.progressBarFill.style.width = pct + '%';
     if (ui.progressLabel)   ui.progressLabel.textContent =
-        `${done} / ${total} ${t('solved') ?? 'solved'}`;
+        `${done} / ${total} richtig${wrong > 0 ? `, ${wrong} noch falsch` : ''}`;
 }
 
 function renderMenu() {
@@ -236,7 +267,7 @@ function renderMenu() {
     const menuSubtitle = document.getElementById('menu-subtitle');
     if (menuSubtitle) menuSubtitle.textContent = t('menuSubtitle');
 
-    const solved = getSolvedSet();
+    const progress = getProgress();
 
     if (!window._menuOrder) {
         window._menuOrder = [...SCENARIOS]
@@ -246,9 +277,11 @@ function renderMenu() {
     }
 
     window._menuOrder.forEach(({ s, i }) => {
-        const isSolved = solved.has(s.id);
+        const scenarioProgress = progress[s.id];
+        const isSolved = (scenarioProgress?.correct ?? 0) > 0;
+        const isWrong = !isSolved && (scenarioProgress?.wrong ?? 0) > 0;
         const card = document.createElement('div');
-        card.className = 'scenario-card' + (isSolved ? ' solved' : '');
+        card.className = 'scenario-card' + (isSolved ? ' solved' : '') + (isWrong ? ' wrong' : '');
 
         const lightsHtml = isSolved
             ? `<div class="lights-preview">${
@@ -288,8 +321,23 @@ function renderMenu() {
     updateProgressUI();
 }
 
-window.markSolved = markSolved;
+window.recordScenarioAnswer = recordScenarioAnswer;
 window.renderMenu = renderMenu;
+
+window.ColregSimulator = {
+    initialize(payload = {}) {
+        appProgress = payload.progress && typeof payload.progress === 'object'
+            ? payload.progress
+            : {};
+        window._menuOrder = SCENARIOS.map((s, i) => ({ s, i }));
+        renderMenu();
+
+        if (payload.scenarioId) {
+            const selected = SCENARIOS.find(s => s.id === payload.scenarioId);
+            if (selected) loadScenario(selected);
+        }
+    },
+};
 
 (function setupModals() {
     const ui = getUI();
@@ -448,12 +496,13 @@ function animate() {
 if (state.currentRoute) {
     const route = state.currentRoute;
 
+    const routeSpeed = route.speed ?? 0.003;
     if (route.type === 'pingpong') {
-        state.routeT += delta * 0.003 * route.dir;
+        state.routeT += delta * routeSpeed * route.dir;
         if (state.routeT >= 1) { state.routeT = 1; route.dir = -1; }
         if (state.routeT <= 0) { state.routeT = 0; route.dir =  1; }
-    } else {
-        state.routeT += delta * 0.003;
+    } else if (route.type !== 'fixed') {
+        state.routeT += delta * routeSpeed;
         if (state.routeT > 1) state.routeT = 0;
     }
 

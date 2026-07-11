@@ -34,10 +34,8 @@ export function handleAnswer(chosen, scenario) {
 function showResult(isCorrect, scenario) {
     const ui = getUI();
 
-    if (isCorrect) {
-        if (window.markSolved) window.markSolved(scenario.id);
-        if (window.renderMenu) window.renderMenu();
-    }
+    if (window.recordScenarioAnswer) window.recordScenarioAnswer(scenario.id, isCorrect);
+    if (window.renderMenu) window.renderMenu();
 
     ui.quizPanel.classList.add('hidden');
     ui.resultOverlay.classList.remove('hidden');

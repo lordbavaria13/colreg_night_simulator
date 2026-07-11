@@ -305,8 +305,9 @@ export function createTargetShip(scenario) {
   return new Promise(async (resolve) => {
     const g = new THREE.Group();
     const col = new THREE.Color(scenario.shipColor);
+    const vesselType = scenario.vesselType ?? scenario.id;
 
-    if (scenario.id === 'trawler') {
+    if (vesselType === 'fishing') {
       try {
         const model = await loadGLB('./assets/models/fishing_boat_01.glb', {
           scale: [2, 2, 2],
@@ -319,16 +320,16 @@ export function createTargetShip(scenario) {
         g.add(createHull(15, 5, 2.0, col, { draft: 1.3 }).mesh);
       }
 
-    } else if (scenario.id === 'segelfahrzeug') {
+    } else if (vesselType === 'sailing') {
       buildSailboat(g, col);
 
-    } else if (scenario.id === 'motorschiff_gross') {
+    } else if (vesselType === 'large_power' || vesselType === 'restricted' || vesselType === 'dredger') {
       buildFreighter(g, col);
 
-    } else if (scenario.id === 'motorschiff_klein') {
+    } else if (vesselType === 'small_power') {
       buildMotorboat(g, col);
 
-    } else if (scenario.id === 'nicht_manoevrierfaehig') {
+    } else if (vesselType === 'not_under_command') {
       buildDisabled(g, col);
 
     } else if (scenario.id === 'schleppverband') {

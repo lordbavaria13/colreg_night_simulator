@@ -4,10 +4,13 @@ import { createTargetShip }   from './models/targetShip.js';
 import { disableDayMode }     from './lighting.js';
 import { buildQuiz }          from './quiz.js';
 import { getUI }              from './ui.js';
-import { getRandomRoute }     from './models/shipRoutes.js';
+import { getScenarioRoute }   from './models/shipRoutes.js';
 import { tScenario }          from './i18n.js';
 
+let loadGeneration = 0;
+
 export async function loadScenario(scenario) {
+    const generation = ++loadGeneration;
     const ui = getUI();
 
     ui.mainMenu.classList.add('hidden');
@@ -24,11 +27,14 @@ export async function loadScenario(scenario) {
     state.playerBoat.position.set(0, 0, 30);
     state.scene.add(state.playerBoat);
 
-    state.targetShip = await createTargetShip(scenario);
+    const targetShip = await createTargetShip(scenario);
+    if (generation !== loadGeneration) return;
+
+    state.targetShip = targetShip;
     state.targetShip.position.set(0, 1.5, -85);
     state.scene.add(state.targetShip);
 
-    state.currentRoute = getRandomRoute();
+    state.currentRoute = getScenarioRoute(scenario.routePreset);
     state.routeT       = state.currentRoute.startT;
 
     state.camera.position.set(0, 10, 30);
@@ -44,6 +50,7 @@ export async function loadScenario(scenario) {
 }
 
 export function backToMenu() {
+    loadGeneration++;
     const ui = getUI();
 
     if (state.playerBoat) {
