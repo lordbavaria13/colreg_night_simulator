@@ -293,8 +293,8 @@ function renderMenu() {
 
         card.innerHTML = `
             <div class="card-number">${t('scenarioLabel')} ${i + 1}</div>
-            <div class="card-title">${isSolved ? tScenario(s, 'title') : '???'}</div>
-            <div class="card-desc">${isSolved ? tScenario(s, 'cardDesc') : '&nbsp;'}</div>
+            <div class="card-title">${tScenario(s, 'title')}</div>
+            <div class="card-desc">${tScenario(s, 'cardDesc')}</div>
             ${lightsHtml}
         `;
         card.onclick = () => loadScenario(s);
